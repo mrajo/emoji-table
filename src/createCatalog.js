@@ -2,9 +2,8 @@ var os = require('os');
 var fs = require('fs');
 var path = require('path');
 var cheerio = require('cheerio');
-var request = require('request');
 
-var url = 'http://www.unicode.org/emoji/charts/full-emoji-list.html';
+var cache_file = path.join('tmp', 'emoji.html');
 var dest = path.join(__dirname, '..', 'dist');
 var catalog = path.join(dest, 'emoji.json');
 
@@ -16,20 +15,20 @@ var columns = [
 	{ index: 16, name: 'tags', transform: parseTags },
 ];
 
-downloadChart(function(body) {
-	var rows = parseMarkup(body);
+createCatalog();
+
+function createCatalog(done) {
+	var data = readCache();
+	var rows = parseMarkup(data);
 	var emoji = transcribeEmoji(rows);
 	writeCatalog(emoji, function() {
 		console.log(emoji.length + ' entries written to ' + catalog);
 	});
-});
+}
 
-function downloadChart(done) {
-	console.log('Downloading the emoji chart...');
-	request.get(url, function(err, resp, body) {
-		if (err || resp.statusCode >= 400) handleError(err);
-		done(body);
-	});
+function readCache(done) {
+	console.log('Reading cached emoji data file...');
+	return fs.readFileSync(cache_file);
 }
 
 function parseMarkup(body) {

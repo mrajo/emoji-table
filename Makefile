@@ -8,6 +8,9 @@ clean:
 	@rm -rf dist lib docs
 
 build:
-	@node src
+	@node src/createCatalog.js
+
+update:
+	@node src/updateCache.js
 
 .PHONY: usage clean build
