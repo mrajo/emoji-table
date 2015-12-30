@@ -9,11 +9,11 @@ var dest = path.join(__dirname, '..', 'dist');
 var catalog = path.join(dest, 'emoji.json');
 
 var columns = [
-	{ index: 1, name:'code',    transform:parseText    },
-	{ index: 2, name:'char',    transform:parseText    },
-	{ index:12, name:'name',    transform:parseText    },
-	{ index:13, name:'version', transform:parseVersion },
-	{ index:15, name:'tags',    transform:parseTags    },
+	{ index:  1, name: 'code', transform: parseText },
+	{ index:  2, name: 'char', transform: parseText },
+	{ index: 13, name: 'name', transform: parseText },
+	{ index: 14, name: 'year', transform: parseYear },
+	{ index: 16, name: 'tags', transform: parseTags },
 ];
 
 downloadChart(function(body) {
@@ -35,7 +35,7 @@ function downloadChart(done) {
 function parseMarkup(body) {
 	console.log('Parsing the markup...');
 	var $ = cheerio.load(body);
-	var rows = $('table tr').slice(1);
+	var rows = $('table tr td').parents().slice(1);
 	return rows.map(function(i, row) {
 		return $(row).find('td').map(function(i, cell) {
 			return $(cell).text();
@@ -56,16 +56,24 @@ function transcribeEmoji(rows) {
 }
 
 function parseText(text) {
-	return text;
+	if (text) {
+		return text;
+	}
+	return '';
 }
 
 function parseTags(text) {
-	return text.split(', ');
+	if (text) {
+		return text.split(', ');
+	}
+	return '';
 }
 
-function parseVersion(text) {
-	var version = text.match(/\d+\.\d+/)[0];
-	return parseFloat(version, 10);
+function parseYear(text) {
+	if (text) {
+		return text.match(/\d{4}/)[0];
+	}
+	return '';
 }
 
 function writeCatalog(data, done) {
