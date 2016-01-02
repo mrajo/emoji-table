@@ -23,7 +23,7 @@ function createCatalog(done) {
 	var rows = parseMarkup(data);
 	var emoji = transcribeEmoji(rows);
 	writeCatalog(emoji, function() {
-		console.log(emoji.length + ' entries written to ' + catalog);
+		console.log(Object.keys(emoji).length + ' entries written to ' + catalog);
 	});
 }
 
@@ -48,14 +48,18 @@ function parseMarkup(body) {
 
 function transcribeEmoji(rows) {
 	console.log('Transcribing emoji details...');
-	return rows.map(function(cells) {
+	var code, emoji = {};
+	rows.forEach(function(cells) {
 		var spec = {};
 		columns.forEach(function(col) {
 			var cell = cells[col.index];
 			spec[col.name] = col.transform(cell);
 		});
-		return spec;
+		code = spec.code;
+		delete spec.code;
+		emoji[code] = spec;
 	});
+	return emoji;
 }
 
 function parseText(text) {
