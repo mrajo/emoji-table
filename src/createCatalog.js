@@ -11,8 +11,9 @@ var columns = [
 	{ index:  1, name: 'code', transform: parseText },
 	{ index:  2, name: 'char', transform: parseText },
 	{ index: 13, name: 'name', transform: parseText },
+	{ index:  5, name: 'icon', transform: parseIcon },
 	{ index: 14, name: 'year', transform: parseYear },
-	{ index: 16, name: 'tags', transform: parseTags },
+	{ index: 16, name: 'tags', transform: parseTags }
 ];
 
 createCatalog();
@@ -37,7 +38,10 @@ function parseMarkup(body) {
 	var rows = $('table tr td').parents().slice(1);
 	return rows.map(function(i, row) {
 		return $(row).find('td').map(function(i, cell) {
-			return $(cell).text();
+			if ($(cell).text()) {
+				return $(cell).text();
+			}
+			return $(cell).html();
 		});
 	}).get();
 }
@@ -71,6 +75,13 @@ function parseTags(text) {
 function parseYear(text) {
 	if (text) {
 		return text.match(/\d{4}/)[0];
+	}
+	return '';
+}
+
+function parseIcon(text) {
+	if (text && text !== 'missing') {
+		return text.match(/src="(.+)"/)[1];
 	}
 	return '';
 }
