@@ -7,10 +7,16 @@ prepublish: clean build
 clean:
 	@rm -rf dist lib docs
 
-build:
-	@node src/createCatalog.js
+buildList:
+	@node src/buildList.js
 
-update:
-	@node src/updateCache.js
+buildHash:
+	@node src/buildHash.js
+
+updateChart:
+	@node src/updateChart.js
+
+updateParse:
+	@node src/updateParse.js
 
 .PHONY: usage clean build
