@@ -1,11 +1,14 @@
 usage:
-	@echo - build ......... builds the emoji table from the unicode charts.
-	@echo - clean ......... removes the built artifacts.
+	@echo - buildList: builds the emoji list from cached parse of unicode charts.
+	@echo - buildHash: builds the emoji hash from cached parse of unicode charts.
+	@echo - updateChart: downloads updated copy of Full Emoji Table.
+	@echo - updateParse: reparses Full Emoji Table.
+	@echo - clean: removes the built artifacts.
 
 prepublish: clean build
 
 clean:
-	@rm -rf dist lib docs
+	@rm -rf dist lib docs tmp
 
 buildList:
 	@node src/buildList.js
