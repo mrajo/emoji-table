@@ -5,8 +5,6 @@ usage:
 	@echo - updateParse: reparses Full Emoji Table.
 	@echo - clean: removes the built artifacts.
 
-prepublish: clean build
-
 clean:
 	@rm -rf dist lib docs tmp
 
@@ -16,10 +14,10 @@ buildList:
 buildHash:
 	@node src/buildHash.js
 
-updateChart:
-	@node src/updateChart.js
+updateCharts:
+	@node src/updateCharts.js
 
 updateParse:
 	@node src/updateParse.js
 
-.PHONY: usage clean build
+.PHONY: usage clean buildList buildHash updateCharts updateParse

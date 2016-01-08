@@ -8,6 +8,7 @@ var build = module.exports = {
 };
 
 var emoji_cache = '../tmp/emoji_raw.json';
+var addon_cache = '../tmp/addon.json';
 
 build.parseText = function (text) {
 	if (text) {
@@ -37,6 +38,14 @@ build.parseIcon = function (text) {
 	return '';
 };
 
+build.parseAddonCode = function (text) {
+	var code = text.match(/U\+[0-9A-Z]+( U\+[0-9A-Z]+)?/);
+	if (code) {
+		return code[0];
+	}
+	return '';
+}
+
 build.writeCatalog = function (data, output, done) {
 	console.log('Writing JSON catalog...');
 	var json = JSON.stringify(data, null, 4);
@@ -65,11 +74,39 @@ build.columns = [
 build.loadEmoji = function (done) {
 	try {
 		build.emoji_data = require(emoji_cache);
+		build.addon_data = require(addon_cache);
 		done();
 	} catch (e) {
 		update.createParsedCache(function () {
-			build.emoji_data = require(emoji_cache);
-			done();
+			build.addonData(function () {
+				build.emoji_data = require(emoji_cache);
+				build.addon_data = require(addon_cache);
+				done();	
+			});
 		});
 	}
+};
+
+build.addonData = function (done) {
+	var raw = require(path.join(update.dest, 'addon_raw.json'));
+	var columns = [
+		{ index: 1, name: 'code', transform: build.parseAddonCode },
+		{ index: 6, name: 'google', transform: build.parseText }
+	];
+	var emoji = {};
+	var code;
+
+	raw.forEach(function(cells) {
+		var spec = {};
+		columns.forEach(function(col) {
+			var cell = cells[col.index];
+			spec[col.name] = col.transform(cell);
+		});
+		code = spec.code;
+		delete spec.code;
+		emoji[code] = spec;
+	});
+
+	// write addon data to cache folder
+	build.writeCatalog(emoji, path.join(update.dest, 'addon.json'), done);
 };
